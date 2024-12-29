@@ -4,18 +4,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Match Player</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Basic styling for the page */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .match-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .match-item {
+      cursor: pointer;
+      margin: 10px;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      width: 200px;
+      text-align: center;
+    }
+    .match-item img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .player {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Live and Upcoming Matches</h1>
-  <div id="data-container">Loading matches...</div>
 
-  <!-- Video Player -->
-  <div id="player-container" style="display: none;">
-    <h2 id="match-title">Match Player</h2>
-    <video id="video-player" controls width="100%" style="max-width: 800px;"></video>
+  <h1>Live Match Player</h1>
+
+  <div id="match-list" class="match-list">
+    <!-- Match list will be populated here -->
   </div>
 
-  <script src="script.js"></script>
+  <div id="player-container" class="player">
+    <!-- Video player will be inserted here -->
+  </div>
+
+  <script>
+    // Define the API URL (direct URL without proxy, since you have fixed CORS issue)
+    const apiUrl = 'https://api.charrons.net/sliv/darshan_sliv.json';
+
+    // Function to fetch the data and populate the match list
+    function fetchMatches() {
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const matchListContainer = document.getElementById('match-list');
+          matchListContainer.innerHTML = ''; // Clear existing content
+
+          // Loop through the data and create match items
+          data.matches.forEach(match => {
+            const matchItem = document.createElement('div');
+            matchItem.classList.add('match-item');
+            matchItem.innerHTML = `
+              <img src="${match.thumbnail}" alt="${match.title}">
+              <p>${match.title}</p>
+            `;
+            matchItem.onclick = () => playMatch(match.streamUrl);
+            matchListContainer.appendChild(matchItem);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+        });
+    }
+
+    // Function to play the match using JW Player
+    function playMatch(streamUrl) {
+      const playerContainer = document.getElementById('player-container');
+      playerContainer.innerHTML = ''; // Clear previous player if any
+
+      const player = document.createElement('div');
+      player.id = 'jwplayer';
+      playerContainer.appendChild(player);
+
+      jwplayer('jwplayer').setup({
+        file: streamUrl,
+        width: '100%',
+        height: '400px',
+        controls: true
+      });
+    }
+
+    // Call fetchMatches when the page loads
+    window.onload = fetchMatches;
+  </script>
+
+  <script src="https://cdn.jwplayer.com/libraries/your-jwplayer-key.js"></script> <!-- Replace with your JW Player key -->
 </body>
 </html>
