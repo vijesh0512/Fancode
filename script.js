@@ -14,24 +14,33 @@ document.addEventListener("DOMContentLoaded", () => {
         return response.json();
       })
       .then(data => {
+        const matches = data.matches; // Extract matches array
         container.innerHTML = ""; // Clear existing data
-        data.forEach(item => {
+        matches.forEach(item => {
           const card = document.createElement("div");
           card.className = "card";
           card.innerHTML = `
-            <h2>${item.matchName || "No Match Name"}</h2>
-            <p>Date: ${item.date || "No Date"}</p>
-            <p>Teams: ${item.team1 || "Team 1"} vs ${item.team2 || "Team 2"}</p>
+            <img src="${item.Image}" alt="${item.MatchName}">
+            <h2>${item.MatchName}</h2>
+            <p>Status: ${item.status}</p>
           `;
-          card.addEventListener("click", () => {
-            playMatch(item.matchName, item.link);
-          });
+
+          // Add click event for live matches
+          if (item.status === "LIVE" && item.video_url) {
+            card.addEventListener("click", () => {
+              playMatch(item.MatchName, item.video_url);
+            });
+          } else {
+            card.style.cursor = "default";
+            card.title = "This match is not live yet.";
+          }
+
           container.appendChild(card);
         });
       })
       .catch(error => {
         console.error("Error fetching JSON data:", error);
-        container.innerHTML = `<p>Error loading data. Please try again later.</p>`;
+        container.innerHTML = `<p>Error loading matches. Please try again later.</p>`;
       });
   };
 
