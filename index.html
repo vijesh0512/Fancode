@@ -22,7 +22,7 @@
       padding: 10px;
       border: 2px solid #ddd;
       border-radius: 8px;
-      width: 200px;
+      width: 250px;
       text-align: center;
     }
     .match-item img {
@@ -31,6 +31,15 @@
     }
     .player {
       margin-top: 20px;
+    }
+    .coming-soon {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      padding: 5px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -47,7 +56,7 @@
   </div>
 
   <script>
-    // Define the API URL (direct URL without proxy, since you have fixed CORS issue)
+    // Define the local JSON file path
     const apiUrl = 'https://darshan.freewebhostmost.com/TAPMAD/tapmad_fixtures.json';
 
     // Function to fetch the data and populate the match list
@@ -58,15 +67,19 @@
           const matchListContainer = document.getElementById('match-list');
           matchListContainer.innerHTML = ''; // Clear existing content
 
-          // Loop through the data and create match items
+          // Loop through the matches and create match items
           data.matches.forEach(match => {
             const matchItem = document.createElement('div');
             matchItem.classList.add('match-item');
             matchItem.innerHTML = `
-              <img src="${match.thumbnail}" alt="${match.title}">
-              <p>${match.title}</p>
+              <img src="${match.Image}" alt="${match.MatchName}">
+              <p>${match.MatchName}</p>
+              ${
+                match.status === "LIVE"
+                  ? `<button onclick="playMatch('${match.video_url}')">Watch Live</button>`
+                  : `<div class="coming-soon">Coming Soon</div>`
+              }
             `;
-            matchItem.onclick = () => playMatch(match.streamUrl);
             matchListContainer.appendChild(matchItem);
           });
         })
