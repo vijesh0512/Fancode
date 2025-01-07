@@ -1,117 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Matches</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .title {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .match-card {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .card {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-        .card:hover {
-            transform: scale(1.05);
-        }
-        .card img {
-            max-width: 100%;
-            border-radius: 8px 8px 0 0;
-        }
-        .card h3 {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-        .card button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px;
-            transition: background-color 0.3s;
-        }
-        .card button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Match Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #0078D7;
+      color: white;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px;
+    }
+    .card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      margin: 15px;
+      padding: 15px;
+      width: 300px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .card h2 {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .card button {
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .card button:hover {
+      background-color: #005BB5;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #0078D7;
+      color: white;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">Live Matches</h1>
-        <div id="match-container" class="match-card"></div>
-    </div>
+  <header>
+    <h1>Live Matches</h1>
+    <p>Click on a match to watch it live.</p>
+  </header>
+  <div class="container" id="match-container">
+    <!-- Matches will be loaded here -->
+  </div>
+  <footer>
+    <p>Powered by Sony Proxy API</p>
+  </footer>
 
-    <script>
-        const API_URL = "https://api.charrons.net/sliv/darshan_sliv.json";
+  <script>
+    const apiUrl = "https://sony-9fx61vhk2-vijesh-s-projects.vercel.app/proxy";
+    const container = document.getElementById("match-container");
 
-        // Function to fetch and update localStorage
-        async function fetchAndUpdateData() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                const data = await response.json();
-                localStorage.setItem("matchesData", JSON.stringify(data)); // Update localStorage
-                displayMatches(data); // Display matches
-            } catch (error) {
-                console.error("Error fetching JSON data:", error);
-                const storedData = localStorage.getItem("matchesData");
-                if (storedData) {
-                    displayMatches(JSON.parse(storedData)); // Fallback to localStorage
-                }
-            }
-        }
+    async function fetchMatches() {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Failed to fetch matches");
 
-        // Function to display matches
-        function displayMatches(data) {
-            const matches = data.matches;
-            const matchContainer = document.getElementById("match-container");
-            matchContainer.innerHTML = ""; // Clear existing content
+        const data = await response.json();
+        renderMatches(data.matches);
+      } catch (error) {
+        console.error("Error fetching matches:", error);
+        container.innerHTML = "<p>Failed to load matches. Please try again later.</p>";
+      }
+    }
 
-            matches.forEach(match => {
-                const card = document.createElement("div");
-                card.className = "card";
+    function renderMatches(matches) {
+      container.innerHTML = ""; // Clear container
+      matches.forEach(match => {
+        const matchCard = document.createElement("div");
+        matchCard.className = "card";
 
-                card.innerHTML = `
-                    <img src="${match.portraitThumb}" alt="${match.title}">
-                    <h3>${match.title}</h3>
-                    <p>${match.episodeTitle}</p>
-                    <button onclick="window.open('${match.pub_url}', '_blank')">Watch Now</button>
-                `;
+        matchCard.innerHTML = `
+          <img src="${match.portraitThumb}" alt="${match.title}">
+          <h2>${match.title}</h2>
+          <p>${match.episodeTitle || "No Episode Title"}</p>
+          <button onclick="openMatch('${match.pub_url}')">Watch Now</button>
+        `;
 
-                matchContainer.appendChild(card);
-            });
-        }
+        container.appendChild(matchCard);
+      });
+    }
 
-        // Fetch and update data on page load
-        fetchAndUpdateData();
-    </script>
+    function openMatch(url) {
+      window.open(url, "_blank");
+    }
+
+    // Fetch matches on page load
+    fetchMatches();
+  </script>
 </body>
 </html>
