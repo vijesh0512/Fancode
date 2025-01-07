@@ -73,11 +73,11 @@
     <!-- Matches will be loaded here -->
   </div>
   <footer>
-    <p>Powered by Sony Proxy API</p>
+    <p>Powered by Fancode Proxy API</p>
   </footer>
 
   <script>
-    const apiUrl = "https://sony-eight.vercel.app/"; // Proxy endpoint
+    const apiUrl = "https://raw.githubusercontent.com/byte-capsule/FanCode-Hls-Fetcher/main/Fancode_hls_m3u8.Json"; // Proxy endpoint
     const container = document.getElementById("match-container");
 
     async function fetchMatches() {
@@ -106,10 +106,10 @@
         matchCard.className = "card";
 
         matchCard.innerHTML = `
-          <img src="${match.portraitThumb}" alt="${match.title}">
-          <h2>${match.title}</h2>
-          <p>${match.episodeTitle || "No Episode Title"}</p>
-          <button onclick="openMatch('${match.pub_url}')">Watch Now</button>
+          <img src="${matches.banner}" alt="${matches.title}">
+          <h2>${matches.match_name}</h2>
+        
+          <button onclick="openMatch('${matches.stream_link}')">Watch Now</button>
         `;
 
         container.appendChild(matchCard);
