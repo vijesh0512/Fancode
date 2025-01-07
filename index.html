@@ -77,12 +77,18 @@
   </footer>
 
   <script>
-    const apiUrl = "https://sony-1djhnajus-vijesh-s-projects.vercel.app/";
+    const apiUrl = "https://sony-eight.vercel.app/"; // Proxy endpoint
     const container = document.getElementById("match-container");
 
     async function fetchMatches() {
       try {
-        const response = await fetch(apiUrl);
+        // Fetch the data from the proxy server
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (!response.ok) throw new Error("Failed to fetch matches");
 
         const data = await response.json();
@@ -94,7 +100,7 @@
     }
 
     function renderMatches(matches) {
-      container.innerHTML = ""; // Clear container
+      container.innerHTML = ""; // Clear container before rendering new data
       matches.forEach(match => {
         const matchCard = document.createElement("div");
         matchCard.className = "card";
@@ -114,7 +120,7 @@
       window.open(url, "_blank");
     }
 
-    // Fetch matches on page load
+    // Fetch matches when the page loads
     fetchMatches();
   </script>
 </body>
